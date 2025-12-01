@@ -1,3 +1,4 @@
+import {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import member_alex from '../assets/images/member-alex.jpg';
 import member_sarah from '../assets/images/member-sarah.jpg';
@@ -9,6 +10,57 @@ import gallery_3 from '../assets/images/gallery-3.jpg';
 import gallery_4 from '../assets/images/gallery-4.jpg';
 
 export default () => {
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [zoomLevel, setZoomLevel] = useState(1);
+
+    const galleryImages = [
+        {src: gallery_1, alt: 'The Midnight Echoes performing live', caption: 'Live at The Blue Note'},
+        {src: gallery_2, alt: 'Band in recording studio', caption: 'Recording "Shadows & Light"'},
+        {src: gallery_3, alt: 'Band members backstage', caption: 'Backstage moments'},
+        {src: gallery_4, alt: 'Concert crowd', caption: 'Our amazing fans'}
+    ];
+
+    const openLightbox = (index) => {
+        setCurrentImageIndex(index);
+        setLightboxOpen(true);
+        setZoomLevel(1);
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeLightbox = () => {
+        setLightboxOpen(false);
+        setZoomLevel(1);
+        document.body.style.overflow = 'auto';
+    };
+
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+        setZoomLevel(1);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+        setZoomLevel(1);
+    };
+
+    const toggleZoom = () => {
+        setZoomLevel(prev => prev === 1 ? 2 : 1);
+    };
+
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (!lightboxOpen) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') nextImage();
+            if (e.key === 'ArrowLeft') prevImage();
+            if (e.key === 'z' || e.key === 'Z') toggleZoom();
+        };
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [lightboxOpen, currentImageIndex, zoomLevel]);
+
     return (<>
         {/* Page Header */}
         <section className="section">
@@ -218,32 +270,284 @@ export default () => {
         <section className="section">
             <div className="section-header">
                 <h2 className="section-title">Gallery</h2>
-                <p className="section-subtitle">Behind the scenes and live performances</p>
+                <p className="section-subtitle">Behind the scenes and live performances - Click to view full size</p>
             </div>
 
-            <div
-                style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem'}}>
-                <img
-                    src={gallery_1}
-                    alt="The Midnight Echoes performing live"
-                    style={{width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px'}}
-                />
-                <img
-                    src={gallery_2}
-                    alt="Band in recording studio"
-                    style={{width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px'}}
-                />
-                <img
-                    src={gallery_3}
-                    alt="Band members backstage"
-                    style={{width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px'}}
-                />
-                <img
-                    src={gallery_4}
-                    alt="Concert crowd"
-                    style={{width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px'}}
-                />
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '1rem',
+                maxWidth: '1200px',
+                margin: '0 auto'
+            }}>
+                {galleryImages.map((image, index) => (
+                    <div
+                        key={index}
+                        onClick={() => openLightbox(index)}
+                        style={{
+                            position: 'relative',
+                            cursor: 'pointer',
+                            overflow: 'hidden',
+                            borderRadius: '12px',
+                            height: '250px',
+                            transition: 'transform 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.querySelector('.overlay').style.opacity = '1';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.querySelector('.overlay').style.opacity = '0';
+                        }}
+                    >
+                        <img
+                            src={image.src}
+                            alt={image.alt}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                        <div
+                            className="overlay"
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(0, 0, 0, 0.7)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                opacity: 0,
+                                transition: 'opacity 0.3s ease',
+                                color: 'white',
+                                fontSize: '2rem'
+                            }}
+                        >
+                            🔍
+                        </div>
+                    </div>
+                ))}
             </div>
         </section>
+
+        {/* Lightbox Modal */}
+        {lightboxOpen && (
+            <div
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.95)',
+                    zIndex: 10000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    animation: 'fadeIn 0.3s ease'
+                }}
+                onClick={closeLightbox}
+            >
+                {/* Close Button */}
+                <button
+                    onClick={closeLightbox}
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '2rem',
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.3s ease',
+                        zIndex: 10002
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                        e.currentTarget.style.transform = 'rotate(90deg)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                        e.currentTarget.style.transform = 'rotate(0deg)';
+                    }}
+                >
+                    ✕
+                </button>
+
+                {/* Previous Button */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        prevImage();
+                    }}
+                    style={{
+                        position: 'absolute',
+                        left: '20px',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '2rem',
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.3s ease',
+                        zIndex: 10002
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                >
+                    ‹
+                </button>
+
+                {/* Next Button */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        nextImage();
+                    }}
+                    style={{
+                        position: 'absolute',
+                        right: '20px',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '2rem',
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.3s ease',
+                        zIndex: 10002
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                >
+                    ›
+                </button>
+
+                {/* Zoom Button */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleZoom();
+                    }}
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        left: '20px',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '1.5rem',
+                        padding: '10px 20px',
+                        borderRadius: '25px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        zIndex: 10002
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                    }}
+                >
+                    {zoomLevel === 1 ? '🔍 Zoom In' : '🔍 Zoom Out'}
+                </button>
+
+                {/* Image Container */}
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                        maxWidth: '90%',
+                        maxHeight: '90%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1rem'
+                    }}
+                >
+                    <img
+                        src={galleryImages[currentImageIndex].src}
+                        alt={galleryImages[currentImageIndex].alt}
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: 'calc(90vh - 100px)',
+                            objectFit: 'contain',
+                            borderRadius: '8px',
+                            transform: `scale(${zoomLevel})`,
+                            transition: 'transform 0.3s ease',
+                            cursor: zoomLevel === 1 ? 'zoom-in' : 'zoom-out'
+                        }}
+                        onClick={toggleZoom}
+                    />
+
+                    {/* Caption and Counter */}
+                    <div style={{
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        padding: '1rem 2rem',
+                        borderRadius: '25px',
+                        textAlign: 'center'
+                    }}>
+                        <p style={{
+                            color: 'white',
+                            margin: 0,
+                            fontSize: '1.1rem',
+                            marginBottom: '0.5rem'
+                        }}>
+                            {galleryImages[currentImageIndex].caption}
+                        </p>
+                        <p style={{
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            margin: 0,
+                            fontSize: '0.9rem'
+                        }}>
+                            {currentImageIndex + 1} / {galleryImages.length}
+                        </p>
+                    </div>
+
+                    {/* Keyboard Hints */}
+                    <p style={{
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        fontSize: '0.85rem',
+                        textAlign: 'center',
+                        margin: 0
+                    }}>
+                        Use ← → arrow keys to navigate • Press ESC to close • Click image or press Z to zoom
+                    </p>
+                </div>
+            </div>
+        )}
     </>);
 };

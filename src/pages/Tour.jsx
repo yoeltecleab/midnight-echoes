@@ -270,38 +270,64 @@ export default () => {
             </div>
 
             <div className="card" style={{maxWidth: '1000px', margin: '0 auto'}}>
-                <div
-                    id="map-container"
-                    style={{
-                        width: '100%',
-                        height: '400px',
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexDirection: 'column'
-                    }}
-                >
-                    {mapLocation ? (<>
-                        <p style={{fontSize: '3rem', margin: 0}}>📍</p>
-                        <p style={{
-                            color: 'var(--text-primary)', marginTop: '1rem', fontWeight: 600
-                        }}>{mapLocation.name}</p>
-                        <p style={{color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem'}}>
-                            Lat: {mapLocation.lat}, Lng: {mapLocation.lng}
-                        </p>
-                        <p style={{color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '1rem'}}>
-                            Google Maps embed will show here
-                        </p>
-                    </>) : (<>
-                        <p style={{fontSize: '3rem', margin: 0}}>🗺️</p>
-                        <p style={{color: 'var(--text-muted)', marginTop: '1rem'}}>Select a show to view venue
-                            location</p>
-                        <p style={{color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem'}}>
-                            Google Maps integration will appear here
-                        </p>
-                    </>)}
+                <div id="map-container" style={{width: '100%', minHeight: '500px'}}>
+                    {mapLocation ? (
+                        <div style={{textAlign: 'center'}}>
+                            <p style={{
+                                color: 'var(--text-primary)',
+                                marginBottom: '1rem',
+                                fontWeight: 600,
+                                fontSize: '1.2rem'
+                            }}>
+                                📍 {mapLocation.name}
+                            </p>
+                            <iframe
+                                width="100%"
+                                height="450"
+                                style={{border: 0, borderRadius: '12px'}}
+                                loading="lazy"
+                                allowFullScreen
+                                referrerPolicy="no-referrer-when-downgrade"
+                                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${mapLocation.lat},${mapLocation.lng}&zoom=15`}
+                            />
+                            <div style={{
+                                marginTop: '1rem',
+                                display: 'flex',
+                                gap: '1rem',
+                                justifyContent: 'center'
+                            }}>
+                                <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${mapLocation.lat},${mapLocation.lng}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-primary"
+                                >
+                                    Open in Google Maps
+                                </a>
+                                <button
+                                    className="btn btn-secondary"
+                                    onClick={() => setMapLocation(null)}
+                                >
+                                    Clear Map
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{
+                            height: '400px',
+                            background: 'rgba(99, 102, 241, 0.1)',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexDirection: 'column'
+                        }}>
+                            <p style={{fontSize: '3rem', margin: 0}}>🗺️</p>
+                            <p style={{color: 'var(--text-muted)', marginTop: '1rem'}}>
+                                Select a show to view venue location
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
