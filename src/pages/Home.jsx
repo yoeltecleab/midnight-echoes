@@ -197,7 +197,11 @@ export default () => {
         </section>
 
         {/* Notification */}
-        {notification && (<div style={{
+        {notification && (<div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            style={{
             position: 'fixed',
             top: '100px',
             right: '20px',

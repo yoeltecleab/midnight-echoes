@@ -90,29 +90,11 @@ export default () => {
 
         <div className={styles.footerBottom}>
             <p>
-                &copy; 2025 The Midnight Echoes. All rights reserved. | Website by{' '}
+                &copy; 2025 The Midnight Echoes. All rights reserved.  Website by{' '}
                 <a href="https://yoeltecleab.github.io" target="_blank" rel="noopener noreferrer">
                     Yoel Tecleab
                 </a>
             </p>
-
-            <div className={styles.validationLinks}>
-                <a
-                    href="https://validator.w3.org/check?uri=referer"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Valid HTML
-                </a>
-                <span>|</span>
-                <a
-                    href="https://jigsaw.w3.org/css-validator/check/referer"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Valid CSS
-                </a>
-            </div>
         </div>
     </footer>);
 };

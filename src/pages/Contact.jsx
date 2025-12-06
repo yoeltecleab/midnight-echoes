@@ -165,6 +165,8 @@ export default () => {
                             onChange={handleChange}
                             placeholder="Your full name"
                             required
+                            aria-describedby={errors.name ? "name-error" : undefined}
+                            aria-invalid={errors.name ? "true" : "false"}
                             style={{
                                 width: '100%',
                                 padding: '1rem',
@@ -175,7 +177,7 @@ export default () => {
                                 fontSize: '1rem'
                             }}
                         />
-                        {errors.name && (<span style={{
+                        {errors.name && (<span id="name-error" role="alert" style={{
                             color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'
                         }}>
                   {errors.name}
@@ -552,7 +554,11 @@ export default () => {
         </section>
 
         {/* Notification */}
-        {notification && (<div style={{
+        {notification && (<div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            style={{
             position: 'fixed',
             top: '100px',
             right: '20px',

@@ -1,0 +1,7 @@
+# Deployment Configuration for Netlify
+
+# This file tells Netlify how to handle client-side routing in React
+# It redirects all routes to index.html so React Router can handle them
+
+/*    /index.html   200
+

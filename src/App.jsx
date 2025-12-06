@@ -12,8 +12,9 @@ import './App.css';
 export default () => {
     return (
         <Router>
+            <a href="#main-content" className="skip-link">Skip to main content</a>
             <Header/>
-            <main>
+            <main id="main-content">
                 <Routes>
                     <Route path="/" element={<Home/>}/>
                     <Route path="/about" element={<About/>}/>

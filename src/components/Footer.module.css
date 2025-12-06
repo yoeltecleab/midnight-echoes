@@ -67,13 +67,6 @@
     color: var(--text-muted);
 }
 
-.validationLinks {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-sm);
-}
-
 @media (max-width: 768px) {
     .footerContainer {
         grid-template-columns: 1fr;
